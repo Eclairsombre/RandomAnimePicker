@@ -9,6 +9,7 @@ function RandomAnime() {
   const [anime, setAnime] = useState({});
   const [genre, setGenre] = useState({});
   const [allSelectedGenre, setAllGenre] = useState([]);
+  const [AlreadySeenId, setAlreadySeenId] = useState([]);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -79,7 +80,8 @@ function RandomAnime() {
               (anime.demographics.length > 0 &&
                 anime.demographics.some(
                   (demographic) => demographic.name === genre
-                ))
+                ) &&
+                !AlreadySeenId.includes(anime.id))
           )
         ) {
           return true;
@@ -105,6 +107,7 @@ function RandomAnime() {
         const temp = request.response;
         console.log(temp.data);
         setAnime(temp.data);
+        setAlreadySeenId([...AlreadySeenId, data[nbAlea].id]);
       };
     } else {
       let animeFiltered = filterAnimeByGenre(data, allSelectedGenre);
@@ -126,6 +129,7 @@ function RandomAnime() {
           const temp = request.response;
           console.log(temp.data);
           setAnime(temp.data);
+          setAlreadySeenId([...AlreadySeenId, animeFiltered[nbAlea].id]);
         };
       }
     }
