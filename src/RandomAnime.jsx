@@ -38,6 +38,7 @@ function RandomAnime() {
   function handleClick() {
     setAnime({});
     setIsError(false);
+    setHasClicked(true);
 
     callApiAnime();
   }
@@ -94,7 +95,17 @@ function RandomAnime() {
   function callApiAnime() {
     if (allSelectedGenre.length === 0) {
       let nbAlea = Math.floor(Math.random() * data.length);
-      setAnime(data[nbAlea]);
+      var requestURL =
+        "https://api.jikan.moe/v4/anime/" + data[nbAlea].id + "/full";
+      var request = new XMLHttpRequest();
+      request.open("GET", requestURL);
+      request.responseType = "json";
+      request.send();
+      request.onload = function () {
+        const temp = request.response;
+        console.log(temp.data);
+        setAnime(temp.data);
+      };
     } else {
       let animeFiltered = filterAnimeByGenre(data, allSelectedGenre);
       if (animeFiltered.length === 0) {
@@ -157,6 +168,7 @@ function RandomAnime() {
           <button className="back" onClick={() => setHasClicked(false)}>
             {"<"}
           </button>
+          {console.log(anime)}
           {anime && <ShowAnime anime={anime} />}
           {isError ? <h1 className="error">{errorMessage}</h1> : <div></div>}
         </>
