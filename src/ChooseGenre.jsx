@@ -1,51 +1,42 @@
 import React, { useState } from "react";
 import BoxGenre from "./BoxGenre";
 
-function ChooseGenre({ genre, allSelectedGenre, setAllGenre }) {
-  const [selectedGenre, setSelectedGenre] = useState("Action");
-
-  const handleGenreChange = (event) => {
-    setSelectedGenre(event.target.value);
-  };
-
-  const addGenre = () => {
-    if (
-      !allSelectedGenre.includes(selectedGenre) &&
-      allSelectedGenre.length < 6
-    ) {
+function ChooseGenre({ genre, allSelectedGenre, setAllGenre, research }) {
+  const addGenre = (selectedGenre) => {
+    if (!allSelectedGenre.includes(selectedGenre)) {
       setAllGenre([...allSelectedGenre, selectedGenre]);
+    } else {
+      setAllGenre(allSelectedGenre.filter((item) => item !== selectedGenre));
     }
   };
 
   if (Object.keys(genre).length !== 0) {
     return (
       <div>
-        <div className="handleGenre">
-          <p>Filter :</p>
-          <select value={selectedGenre} onChange={handleGenreChange}>
-            {genre.map((item) => (
-              <option key={item.id} value={item.name}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-
-          <button onClick={addGenre}>Add</button>
-        </div>
-
         <div className="allGenre">
-          {allSelectedGenre.map((item) => (
-            <BoxGenre
-              genre={item}
-              allSelectedGenre={allSelectedGenre}
-              setAllGenre={setAllGenre}
-            />
-          ))}
+          {genre.map((item) =>
+            item.name.toLowerCase().includes(research.toLowerCase()) ||
+            research === "" ? (
+              <div
+                className="box-genre"
+                style={{
+                  opacity: allSelectedGenre.includes(item.name) ? 1 : 0.4,
+                }}
+              >
+                <button
+                  className="nameGenre"
+                  onClick={() => addGenre(item.name)}
+                >
+                  {item.name}
+                </button>
+              </div>
+            ) : null
+          )}
         </div>
       </div>
     );
   } else {
-    return <div></div>;
+    return null;
   }
 }
 

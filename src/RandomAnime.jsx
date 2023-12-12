@@ -13,6 +13,9 @@ function RandomAnime() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
+  const [hasClicked, setHasClicked] = useState(false);
+  const [researchBar, setResearchBar] = useState("");
+
   useEffect(() => {
     if (anime) {
     } else {
@@ -99,26 +102,66 @@ function RandomAnime() {
         setIsError(true);
       } else {
         let nbAlea = Math.floor(Math.random() * animeFiltered.length);
-        setAnime(animeFiltered[nbAlea]);
+        console.log(animeFiltered[nbAlea].id);
+        var requestURL =
+          "https://api.jikan.moe/v4/anime/" +
+          animeFiltered[nbAlea].id +
+          "/full";
+        var request = new XMLHttpRequest();
+        request.open("GET", requestURL);
+        request.responseType = "json";
+        request.send();
+        request.onload = function () {
+          const temp = request.response;
+          console.log(temp.data);
+          setAnime(temp.data);
+        };
       }
     }
   }
 
+  const handleInputChange = (event) => {
+    setResearchBar(event.target.value);
+  };
+
   return (
-    <>
-      {console.log(anime)}
-      <h1 className="MainTitle">RandomAnimePicker</h1>
-      <ChooseGenre
-        genre={genre}
-        allSelectedGenre={allSelectedGenre}
-        setAllGenre={setAllGenre}
-      />
-      <button className="picker" onClick={() => handleClick()}>
-        Search
-      </button>
-      {anime && <ShowAnime anime={anime} />}
-      {isError ? <h1 className="error">{errorMessage}</h1> : <div></div>}
-    </>
+    <div>
+      <h1 className="MainTitle">Random Anime Picker</h1>
+      {!hasClicked ? (
+        <>
+          <input type="text" value={researchBar} onChange={handleInputChange} />
+          <ChooseGenre
+            genre={genre}
+            allSelectedGenre={allSelectedGenre}
+            setAllGenre={setAllGenre}
+            research={researchBar}
+          />
+          <button
+            className="picker"
+            onClick={() => {
+              setAllGenre([]);
+              setResearchBar("");
+            }}
+          >
+            Reset
+          </button>
+          <button className="picker" onClick={handleClick}>
+            Search
+          </button>
+        </>
+      ) : (
+        <>
+          <button className="reroll" onClick={handleClick}>
+            Reroll
+          </button>
+          <button className="back" onClick={() => setHasClicked(false)}>
+            {"<"}
+          </button>
+          {anime && <ShowAnime anime={anime} />}
+          {isError ? <h1 className="error">{errorMessage}</h1> : <div></div>}
+        </>
+      )}
+    </div>
   );
 }
 
